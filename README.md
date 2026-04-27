@@ -31,9 +31,9 @@ Construire une application complete avec :
 - [x] Verifier le chargement avec un test simple
 - [x] Implementer le chunking des documents
 - [x] Verifier le chunking avec overlap
-- [ ] Ajouter la configuration centralisee du projet
-- [ ] Implementer les embeddings
-- [ ] Construire et sauvegarder l'index FAISS
+- [x] Ajouter la configuration centralisee du projet
+- [x] Implementer les embeddings
+- [x] Construire et sauvegarder l'index FAISS
 - [ ] Implementer la recherche de passages pertinents
 - [ ] Connecter un LLM pour la generation de reponse
 - [ ] Construire une pipeline RAG complete
@@ -55,6 +55,12 @@ Construire une application complete avec :
 
 - implementation de `DocumentSplitter`
 - test du decoupage en chunks avec overlap
+
+### Etape 3 - Embeddings et indexation vectorielle
+
+- implementation d'un gestionnaire d'index FAISS
+- generation d'embeddings en local avec un modele Hugging Face
+- creation et sauvegarde de l'index vectoriel pour les chunks
 
 ## Structure du projet
 
@@ -82,8 +88,6 @@ python -m tests.test_splitter
 
 ## Prochaines etapes
 
-- creer les embeddings
-- construire la base vectorielle FAISS
 - implementer la recherche de contexte
 - connecter un LLM pour generer la reponse
 - creer l'interface Streamlit
