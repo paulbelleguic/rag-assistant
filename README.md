@@ -24,6 +24,27 @@ Construire une application complete avec :
 
 ## Avancement du projet
 
+### Checklist projet
+
+- [x] Initialiser la structure du projet
+- [x] Implementer le chargement de documents texte
+- [x] Verifier le chargement avec un test simple
+- [x] Implementer le chunking des documents
+- [x] Verifier le chunking avec overlap
+- [ ] Ajouter la configuration centralisee du projet
+- [ ] Implementer les embeddings
+- [ ] Construire et sauvegarder l'index FAISS
+- [ ] Implementer la recherche de passages pertinents
+- [ ] Connecter un LLM pour la generation de reponse
+- [ ] Construire une pipeline RAG complete
+- [ ] Afficher les sources utilisees dans la reponse
+- [ ] Ajouter une interface Streamlit
+- [ ] Permettre l'upload de documents
+- [ ] Ajouter un historique de conversation
+- [ ] Ajouter des tests supplementaires
+- [ ] Ameliorer le README avec captures et architecture finale
+- [ ] Preparer le projet pour le deploiement
+
 ### Etape 1 - Chargement de documents
 
 - creation de la structure du projet
