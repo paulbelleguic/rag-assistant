@@ -5,7 +5,7 @@ from app.vectorstore.faiss_store import VectorStoreManager
 loader = DocumentLoader()
 documents = loader.load_documents("data/raw/mon_document.txt")
 
-splitter = DocumentSplitter(chunk_size=80, chunk_overlap=20)
+splitter = DocumentSplitter(chunk_size=150, chunk_overlap=30)
 chunks = splitter.split_documents(documents)
 
 manager = VectorStoreManager()

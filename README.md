@@ -34,10 +34,12 @@ Construire une application complete avec :
 - [x] Ajouter la configuration centralisee du projet
 - [x] Implementer les embeddings
 - [x] Construire et sauvegarder l'index FAISS
-- [ ] Implementer la recherche de passages pertinents
-- [ ] Connecter un LLM pour la generation de reponse
-- [ ] Construire une pipeline RAG complete
-- [ ] Afficher les sources utilisees dans la reponse
+- [x] Implementer la recherche de passages pertinents
+- [x] Connecter un LLM pour la generation de reponse
+- [x] Construire une pipeline RAG complete
+- [x] Afficher les sources utilisees dans la reponse
+- [x] Ajouter un reranking simple des passages
+- [x] Ajouter un fallback de reponse plus robuste
 - [ ] Ajouter une interface Streamlit
 - [ ] Permettre l'upload de documents
 - [ ] Ajouter un historique de conversation
@@ -61,6 +63,14 @@ Construire une application complete avec :
 - implementation d'un gestionnaire d'index FAISS
 - generation d'embeddings en local avec un modele Hugging Face
 - creation et sauvegarde de l'index vectoriel pour les chunks
+
+### Etape 4 - Retrieval et pipeline RAG
+
+- implementation d'un retriever pour interroger FAISS avec une question
+- construction d'une pipeline RAG unifiee
+- affichage de la reponse, du contexte et des sources
+- ajout d'un reranking simple par mots-cles
+- ajout d'un fallback pour produire une reponse plus robuste en francais
 
 ## Structure du projet
 
@@ -88,6 +98,7 @@ python -m tests.test_splitter
 
 ## Prochaines etapes
 
-- implementer la recherche de contexte
-- connecter un LLM pour generer la reponse
 - creer l'interface Streamlit
+- permettre l'upload de documents
+- ajouter un historique de conversation
+- ameliorer la qualite de generation avec un modele plus performant
