@@ -14,6 +14,6 @@ env/
 .DS_Store
 Thumbs.db
 
-data/processed/
+data/
 
 .streamlit/secrets.toml
