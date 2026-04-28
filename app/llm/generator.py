@@ -39,6 +39,33 @@ class AnswerGenerator:
 
         return answer
 
+    def summarize(self, context: str, max_new_tokens: int = 180) -> str:
+        if not context.strip():
+            return "Je ne dispose pas de contenu suffisant pour produire un resume."
+
+        prompt = (
+            "Resume le document suivant en francais de maniere claire et concise.\n\n"
+            f"Document :\n{context}\n\n"
+            "Resume :"
+        )
+        inputs = self.tokenizer(
+            prompt,
+            return_tensors="pt",
+            truncation=True,
+            max_length=1024
+        )
+        outputs = self.model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False
+        )
+        summary = self.tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+
+        if self._should_fallback(summary):
+            return self._build_fallback_summary(context)
+
+        return summary
+
     @staticmethod
     def _should_fallback(answer: str) -> bool:
         cleaned = answer.strip().lower()
@@ -81,3 +108,17 @@ class AnswerGenerator:
             return f"D'apres le document, {sentences[0]}"
 
         return f"D'apres le document, {sentences[0]} {sentences[1]}"
+
+    @staticmethod
+    def _build_fallback_summary(context: str) -> str:
+        sentences = [
+            sentence.strip()
+            for sentence in re.split(r"(?<=[.!?])\s+", context.strip())
+            if sentence.strip()
+        ]
+
+        if not sentences:
+            return "Je ne dispose pas de contenu suffisant pour produire un resume."
+
+        selected = sentences[:3]
+        return "Resume du document : " + " ".join(selected)

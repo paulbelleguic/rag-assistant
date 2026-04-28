@@ -6,7 +6,7 @@ from app.ingestion.pipeline import IngestionPipeline
 from app.pipeline import RAGPipeline
 
 
-APP_TITLE = "RAG Assistant"
+APP_TITLE = "Academic RAG Assistant"
 RAW_DATA_DIR = Path("data/raw")
 SUPPORTED_EXTENSIONS = {".txt", ".pdf"}
 
@@ -56,10 +56,48 @@ def handle_upload() -> None:
 
 
 def handle_question() -> None:
-    st.subheader("Poser une question")
+    st.subheader("Assistant academique")
 
-    question = st.text_input("Ta question", placeholder="Exemple : Qu'est-ce que le RAG ?")
+    question = st.text_input(
+        "Ta question",
+        placeholder="Exemple : Explique la notion de RAG dans ce cours.",
+    )
     show_passages = st.checkbox("Afficher les passages pertinents", value=False)
+    action = st.radio(
+        "Choisis une action",
+        options=["Question / reponse", "Resume du document"],
+        horizontal=True,
+    )
+
+    if action == "Resume du document":
+        if st.button("Generer un resume"):
+            if not st.session_state.get("document_ready", False):
+                st.warning("Charge et indexe d'abord un document.")
+                return
+
+            try:
+                rag_pipeline = get_rag_pipeline(st.session_state.get("index_version", 0))
+                result = rag_pipeline.summarize_document(k=4)
+
+                st.subheader("Resume")
+                st.write(result["summary"])
+
+                st.subheader("Sources")
+                for source in result["sources"]:
+                    st.write(f"- {source}")
+
+                if show_passages:
+                    with st.expander("Passages utilises pour le resume"):
+                        for index, passage in enumerate(result["passages"], start=1):
+                            st.markdown(
+                                f"**Passage {index}**  \n"
+                                f"Source : `{passage['source']}`  \n"
+                                f"Score : `{passage['score']:.4f}`"
+                            )
+                            st.write(passage["content"])
+            except Exception as exc:
+                st.error(f"Erreur pendant la generation du resume : {exc}")
+        return
 
     if st.button("Poser la question"):
         if not question.strip():
@@ -97,7 +135,9 @@ def handle_question() -> None:
 def main() -> None:
     st.set_page_config(page_title=APP_TITLE, page_icon=":books:", layout="wide")
     st.title(APP_TITLE)
-    st.write("Charge un document, indexe-le, puis pose une question en langage naturel.")
+    st.write(
+        "Charge un cours PDF ou texte, indexe-le, puis pose une question ou genere un resume."
+    )
 
     if "document_ready" not in st.session_state:
         st.session_state["document_ready"] = False

@@ -40,6 +40,30 @@ class RAGPipeline:
             ],
         }
 
+    def summarize_document(self, k: int = 4) -> dict:
+        results = self.retriever.retrieve_with_scores(query="resume du document cours notions principales", k=k)
+        documents = [item["document"] for item in results]
+        context = "\n\n".join(doc.page_content for doc in documents)
+        summary = self.generator.summarize(context=context)
+
+        sources = list(dict.fromkeys(
+            doc.metadata.get("source", "source inconnue") for doc in documents
+        ))
+
+        return {
+            "summary": summary,
+            "context": context,
+            "sources": sources,
+            "passages": [
+                {
+                    "content": item["document"].page_content,
+                    "source": item["document"].metadata.get("source", "source inconnue"),
+                    "score": item["score"],
+                }
+                for item in results
+            ],
+        }
+
     @staticmethod
     def _extract_keywords(question: str) -> list[str]:
         tokens = re.findall(r"\b\w+\b", question.lower())
