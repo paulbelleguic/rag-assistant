@@ -77,14 +77,27 @@ class AnswerGenerator:
             return True
 
         prompt_leak_patterns = [
+            "vous etes un assistant de support client",
+            "vous êtes un assistant de support client",
+            "tu es un assistant de support client",
+            "tu es un assistant de support client pour un site e-commerce",
             "reponds en francais",
+            "réponds en français",
             "using only the contexte",
             "if information is not present",
             "dis clairement que tu ne sais pas",
             "contexte ci-dessous",
+            "reponse de support",
+            "réponse de support",
         ]
 
         if any(pattern in cleaned for pattern in prompt_leak_patterns):
+            return True
+
+        if cleaned.startswith("vous êtes") or cleaned.startswith("vous etes"):
+            return True
+
+        if cleaned.startswith("tu es"):
             return True
 
         if " and " in cleaned or "research" in cleaned:
@@ -95,30 +108,45 @@ class AnswerGenerator:
 
     @staticmethod
     def _build_fallback_answer(context: str) -> str:
-        sentences = [
-            sentence.strip()
-            for sentence in re.split(r"(?<=[.!?])\s+", context.strip())
-            if sentence.strip()
-        ]
+        sentences = AnswerGenerator._extract_meaningful_sentences(context)
 
         if not sentences:
             return "Je ne dispose pas de contexte suffisant pour repondre."
 
         if len(sentences) == 1:
-            return f"D'apres le document, {sentences[0]}"
+             return f"Selon notre FAQ, {sentences[0]}"
 
-        return f"D'apres le document, {sentences[0]} {sentences[1]}"
+        selected = sentences[:3]
+        return "Selon notre FAQ, " + " ".join(selected)
+
+
+        return f"Selon notre FAQ, {sentences[0]} {sentences[1]}"
 
     @staticmethod
     def _build_fallback_summary(context: str) -> str:
-        sentences = [
-            sentence.strip()
-            for sentence in re.split(r"(?<=[.!?])\s+", context.strip())
-            if sentence.strip()
-        ]
+        sentences = AnswerGenerator._extract_meaningful_sentences(context)
 
         if not sentences:
             return "Je ne dispose pas de contenu suffisant pour produire un resume."
 
         selected = sentences[:3]
         return "Resume du document : " + " ".join(selected)
+
+    @staticmethod
+    def _extract_meaningful_sentences(context: str) -> list[str]:
+        normalized_context = context.replace("\n", " ")
+        raw_sentences = [
+            sentence.strip()
+            for sentence in re.split(r"(?<=[.!?])\s+", normalized_context.strip())
+            if sentence.strip()
+        ]
+
+        cleaned_sentences = []
+        for sentence in raw_sentences:
+            # Ignore short section titles such as "Frais de livraison" or "Retours".
+            if len(sentence.split()) <= 4 and not re.search(r"[.!?]$", sentence):
+                continue
+
+            cleaned_sentences.append(sentence)
+
+        return cleaned_sentences

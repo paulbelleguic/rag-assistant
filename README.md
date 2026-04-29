@@ -30,18 +30,72 @@ The current repository provides the technical foundation for the first version o
 
 This first e-commerce version starts with a support knowledge base stored in documents.
 
-## V1 Target
+## V1 Scope
 
-The V1 objective is to build a customer support assistant that answers from a FAQ-style knowledge base covering:
+The V1 assistant answers support questions related to:
 
 - delivery
-- returns
-- refunds
-- payment
+- shipping fees
 - order tracking
+- returns
+- exchanges
+- discounted items
+- refunds
+- payment methods
+- order cancellation
+- defective products
 - customer service
+- promo codes
 
 At this stage, the assistant does not yet query a product catalog.
+
+# E-commerce Support Assistant
+
+E-commerce Support Assistant is a portfolio project focused on building an AI customer support assistant for online stores. The application uses a Retrieval-Augmented Generation (RAG) pipeline to answer customer questions from an internal support knowledge base.
+
+## Project Goal
+
+Build a practical AI assistant able to answer common customer support questions such as:
+
+- What are the delivery times?
+- Can I return a discounted product?
+- Which payment methods are accepted?
+- How do I track my order?
+- How long does a refund take?
+
+This first version is based on a FAQ-style support document and is designed as the foundation for a larger hybrid assistant.
+
+## V1 Scope
+
+The V1 assistant answers support questions related to:
+
+- delivery
+- shipping fees
+- order tracking
+- returns
+- exchanges
+- discounted items
+- refunds
+- payment methods
+- order cancellation
+- defective products
+- customer service
+- promo codes
+
+At this stage, the assistant does not yet query a product catalog.
+
+## Current Features
+
+- internal FAQ knowledge base
+- local document ingestion
+- text chunking
+- local embeddings
+- FAISS vector search
+- support-oriented answer generation
+- fallback answer strategy for more stable responses
+- Streamlit interface
+- source display
+- relevant passage display
 
 ## Tech Stack
 
@@ -53,7 +107,32 @@ At this stage, the assistant does not yet query a product catalog.
 - Transformers
 - PyPDF
 
-## Planned Features
+## How It Works
+
+1. The FAQ knowledge base is loaded and indexed.
+2. The text is split into chunks.
+3. Chunks are embedded with a local Hugging Face model.
+4. Embeddings are stored in a FAISS vector index.
+5. A customer question is matched against the indexed support passages.
+6. The most relevant passages are retrieved and lightly re-ranked.
+7. The system generates a grounded support answer from the retrieved context.
+
+## Example Questions
+
+- "Quels sont les délais de livraison ?"
+- "Quels sont les frais de livraison ?"
+- "Puis-je retourner un article soldé ?"
+- "Sous combien de temps suis-je remboursé ?"
+- "Quels moyens de paiement acceptez-vous ?"
+- "Comment suivre ma commande ?"
+- "Puis-je annuler une commande déjà expédiée ?"
+
+## Current Limitations
+
+- best performance is on simple support questions directly covered by the FAQ
+- the current version works from one internal knowledge base
+- the assistant does not yet search a structured product catalog
+- generation quality is limited by the local model
 
 ### V1 - Support Knowledge Assistant
 
@@ -118,9 +197,9 @@ The next step is to adapt this foundation to the e-commerce support use case, st
 
 ### In Progress
 
-- [ ] Reposition the app for e-commerce support
-- [ ] Build V1 from a FAQ knowledge base
-- [ ] Adapt prompts to customer support use cases
+- [x] Reposition the app for e-commerce support
+- [x] Build the V1 around a FAQ knowledge base
+- [x] Adapt prompts to customer support use cases
 - [ ] Test the assistant on delivery, return, and payment questions
 
 ### Next
@@ -131,6 +210,32 @@ The next step is to adapt this foundation to the e-commerce support use case, st
 - [ ] Add conversation memory
 - [ ] Improve generation quality
 - [ ] Add screenshots and deployment preparation
+
+### V1 - Support Knowledge Assistant
+- [x]  build a FAQ-based support assistant
+- [x]  answer customer support questions
+- [x]  display sources and relevant passages
+- [x]  stabilize responses with fallback logic
+
+### V2 - Product Catalog Search
+- [ ]  add structured product data
+- [ ]  search by category, size, color, and price
+- [ ]  return product matches from tabular data
+
+### V3 - Hybrid Assistant
+- [ ]  detect support vs product questions
+- [ ]  route requests to the right source
+- [ ]  combine FAQ answers and product answers
+
+### V4 - Conversational Experience
+- [ ]  add conversation history
+- [ ]  support follow-up questions
+- [ ]  keep short-term conversational context
+
+### V5 - Final version
+- [ ]  improve UI and UX
+- [ ]  strengthen generation quality
+- [ ]  prepare a polished demo version
 
 ## Project Structure
 
@@ -180,14 +285,6 @@ python -m tests.test_retriever
 python -m tests.test_rag_pipeline
 ```
 
-## Example V1 Questions
-
-- "Quels sont les delais de livraison ?"
-- "Puis-je retourner un article solde ?"
-- "Sous combien de temps suis-je rembourse ?"
-- "Quels moyens de paiement acceptez-vous ?"
-- "Comment suivre ma commande ?"
-
 ## Why This Project Matters
 
 This project is more than a simple chatbot. It is designed to demonstrate:
@@ -200,4 +297,4 @@ This project is more than a simple chatbot. It is designed to demonstrate:
 
 ## Next Immediate Step
 
-The next concrete step is to implement the V1 e-commerce support assistant using the FAQ knowledge base in `data/raw/faq.txt`.
+The next concrete step is to validate the V1 e-commerce support assistant on realistic support questions using the FAQ knowledge base in `data/raw/faq.txt`.

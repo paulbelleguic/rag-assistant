@@ -2,7 +2,7 @@ from app.pipeline import RAGPipeline
 
 pipeline = RAGPipeline()
 
-result = pipeline.ask("Qu'est-ce que le RAG ?", k=2)
+result = pipeline.ask("Puis-je retourner un article solde ?", k=2)
 
 print(f"Question : {result['question']}")
 print("\n--- Contexte recupere ---")
