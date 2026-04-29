@@ -27,6 +27,8 @@ The current version already supports:
 - simple conversational follow-ups such as product refinements
 - a retail-inspired chatbot interface in Streamlit
 
+This repository represents a complete portfolio version of the project: the core product is functional, testable, and demonstrable end-to-end.
+
 ## Product Versions
 
 ### V1 - Support Knowledge Assistant
@@ -154,6 +156,24 @@ Added a stronger product-facing presentation layer with:
 - "Avez-vous des sneakers noires en 42 ?"
 - "et en 43 ?"
 
+## Demo Scenarios
+
+### Scenario 1 - Support FAQ
+
+- Ask: `Quels sont les delais de livraison ?`
+- Expected behavior: the assistant routes the question to the FAQ support pipeline and answers from the delivery policy.
+
+### Scenario 2 - Product Search
+
+- Ask: `Avez-vous des sneakers noires en 42 ?`
+- Expected behavior: the assistant routes the question to the catalog pipeline and returns the matching product with price and stock.
+
+### Scenario 3 - Conversational Follow-up
+
+- Ask first: `Avez-vous des sneakers noires en 42 ?`
+- Then ask: `et en 43 ?`
+- Expected behavior: the assistant keeps the product context and answers with the size 43 result.
+
 ## Current Limitations
 
 - the support assistant still relies on a single FAQ document
@@ -161,6 +181,20 @@ Added a stronger product-facing presentation layer with:
 - follow-up memory is short-term and heuristic-based
 - support answer generation quality depends on the local model and fallback logic
 - the visual storefront is a presentation layer, not a real e-commerce backend
+
+## QA Status
+
+Manual QA has been performed on:
+
+- support FAQ questions
+- product search questions
+- short conversational follow-ups
+
+Main result:
+
+- the catalog side is globally reliable
+- the hybrid routing works well on the main demo scenarios
+- the support side is functional but still has some answer-quality limitations on a few FAQ topics
 
 ## Project Structure
 
@@ -226,6 +260,11 @@ python -m tests.test_query_router
 python -m tests.test_ecommerce_assistant_pipeline
 ```
 
+## QA And Presentation Assets
+
+- QA checklist: [docs/qa_test_checklist.md](C:\cours\Projet\LLM chatbot\rag-assistant\docs\qa_test_checklist.md)
+- Presentation kit: [docs/project_presentation.md](C:\cours\Projet\LLM chatbot\rag-assistant\docs\project_presentation.md)
+
 ## Why This Project Matters
 
 This project demonstrates:
@@ -237,7 +276,7 @@ This project demonstrates:
 - conversational assistant design
 - business-oriented AI product thinking
 
-## Roadmap
+## Project Status
 
 ### Completed
 
@@ -246,11 +285,13 @@ This project demonstrates:
 - [x] Build V3 hybrid assistant routing
 - [x] Add conversational follow-up handling
 - [x] Build a retail-inspired Streamlit interface
+- [x] Run manual QA on core user scenarios
+- [x] Prepare documentation and presentation assets
 
-### Next
+### Possible Future Improvements
 
 - [ ] Improve support answer quality further
 - [ ] Expand product query coverage
 - [ ] Add stronger conversation memory
 - [ ] Add more robust evaluation and testing
-- [ ] Prepare a polished final demo and deployment
+- [ ] Prepare deployment and a polished demo video
