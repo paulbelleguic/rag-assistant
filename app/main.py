@@ -1,7 +1,7 @@
 import streamlit as st
 
+from app.assistant.pipeline import EcommerceAssistantPipeline
 from app.ingestion.pipeline import IngestionPipeline
-from app.pipeline import RAGPipeline
 
 
 APP_TITLE = "E-commerce Support Assistant"
@@ -9,9 +9,9 @@ DEFAULT_FAQ_PATH = "data/raw/faq.txt"
 
 
 @st.cache_resource
-def get_rag_pipeline(index_version: int) -> RAGPipeline:
-    """Charge la pipeline RAG a partir de l'index courant."""
-    return RAGPipeline()
+def get_assistant_pipeline(index_version: int) -> EcommerceAssistantPipeline:
+    """Charge la pipeline hybride a partir de l'index courant."""
+    return EcommerceAssistantPipeline()
 
 
 def initialize_knowledge_base() -> None:
@@ -53,25 +53,35 @@ def handle_question() -> None:
             return
 
         try:
-            rag_pipeline = get_rag_pipeline(st.session_state.get("index_version", 0))
-            result = rag_pipeline.ask(question=question, k=4)
+            assistant_pipeline = get_assistant_pipeline(st.session_state.get("index_version", 0))
+            result = assistant_pipeline.ask(query=question)
 
             st.subheader("Reponse")
             st.write(result["answer"])
+
+            st.caption(
+                f"Routage : {result['route']} | "
+                f"support_score={result['routing']['support_score']} | "
+                f"product_score={result['routing']['product_score']}"
+            )
 
             st.subheader("Sources")
             for source in result["sources"]:
                 st.write(f"- {source}")
 
-            if show_passages:
+            if show_passages and result["route"] == "support":
                 with st.expander("Passages pertinents"):
-                    for index, passage in enumerate(result["passages"], start=1):
+                    for index, passage in enumerate(result["details"]["passages"], start=1):
                         st.markdown(
                             f"**Passage {index}**  \n"
                             f"Source : `{passage['source']}`  \n"
                             f"Score : `{passage['score']:.4f}`"
                         )
                         st.write(passage["content"])
+            elif show_passages and result["route"] == "catalog":
+                with st.expander("Details catalogue"):
+                    st.write("Filtres extraits :", result["details"]["filters"])
+                    st.write(result["details"]["formatted_results"])
         except Exception as exc:
             st.error(f"Erreur pendant la generation de la reponse : {exc}")
 
