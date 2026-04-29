@@ -1,29 +1,37 @@
 # E-commerce Support Assistant
 
-E-commerce Support Assistant is a portfolio project focused on building an AI assistant for online retail. The project combines two complementary capabilities:
+E-commerce Support Assistant is a portfolio project focused on building a hybrid AI assistant for online retail. It combines:
 
-- a FAQ-based support assistant for delivery, returns, refunds, and payment questions
+- a FAQ-based support assistant for delivery, returns, refunds, payment, and order tracking
 - a structured product search engine for catalog questions such as size, color, price, and stock
 
-The goal is to evolve this into a hybrid assistant able to route each user question to the right data source.
+The application routes each user question to the right source and exposes the result through a modern Streamlit interface.
 
 ## Project Goal
 
-Build a practical e-commerce assistant that can handle questions like:
+Build a practical e-commerce assistant able to answer questions like:
 
 - "Quels sont les delais de livraison ?"
 - "Puis-je retourner un article solde ?"
 - "Quels moyens de paiement acceptez-vous ?"
-- "Avez-vous des sneakers black en 42 ?"
+- "Avez-vous des sneakers noires en 42 ?"
 - "Montre-moi des produits a moins de 60 euros."
+
+## Current Product State
+
+The current version already supports:
+
+- support and policy questions from a FAQ knowledge base
+- product and catalog questions from structured data
+- automatic routing between FAQ support and catalog search
+- simple conversational follow-ups such as product refinements
+- a retail-inspired chatbot interface in Streamlit
 
 ## Product Versions
 
 ### V1 - Support Knowledge Assistant
 
-The assistant answers customer support questions from an internal FAQ knowledge base.
-
-Covered topics:
+Built a FAQ-based support assistant for:
 
 - delivery
 - shipping fees
@@ -40,9 +48,7 @@ Covered topics:
 
 ### V2 - Product Catalog Search
 
-The assistant can now search a structured product catalog using parsed filters extracted from natural language queries.
-
-Covered filters:
+Added a structured product catalog with natural-language filtering on:
 
 - category
 - gender
@@ -53,22 +59,42 @@ Covered filters:
 
 ### V3 - Hybrid Assistant
 
-The next step is to combine both systems through a routing layer:
+Combined both systems with:
 
-- support and policy questions -> FAQ RAG pipeline
-- product and catalog questions -> catalog pipeline
+- question routing between support and catalog
+- unified assistant pipeline
+- support for short follow-up queries
+
+### V4 - Conversational Experience
+
+Improved the interaction layer with:
+
+- chat history
+- follow-up handling
+- more natural support answers
+- better routing and parsing behavior
+
+### V5 - UI Showcase
+
+Added a stronger product-facing presentation layer with:
+
+- a modern retail-inspired layout
+- a storefront-style left panel
+- a rounded floating assistant panel
+- scrollable in-panel chat history
 
 ## Current Features
 
-- FAQ knowledge base indexing
-- text chunking and local embeddings
-- FAISS vector search
-- FAQ question answering with fallback response logic
-- structured product catalog in CSV
+- FAQ knowledge base indexing from `data/raw/faq.txt`
+- chunking, embeddings, and FAISS retrieval
+- support answer generation with fallback logic
+- structured product catalog from `data/raw/products.csv`
 - natural-language product query parsing
-- product filtering with pandas
-- formatted product search results
-- Streamlit application entrypoint
+- catalog filtering with pandas
+- automatic routing between support and product search
+- simple conversational memory for follow-up requests
+- modern Streamlit chatbot interface
+- source display and optional technical details
 
 ## Tech Stack
 
@@ -90,7 +116,7 @@ The next step is to combine both systems through a routing layer:
 3. Chunks are embedded locally.
 4. Embeddings are stored in a FAISS index.
 5. A support question retrieves the most relevant passages.
-6. The assistant generates a grounded response from the retrieved context.
+6. The assistant generates a grounded support answer from the retrieved context.
 
 ### Product Catalog Flow
 
@@ -98,6 +124,13 @@ The next step is to combine both systems through a routing layer:
 2. A user query is parsed into structured filters.
 3. The catalog is filtered by category, gender, color, size, price, and stock.
 4. Matching products are formatted into a readable answer.
+
+### Hybrid Routing Flow
+
+1. The user asks a question in the chat interface.
+2. A router classifies the query as `support` or `catalog`.
+3. The assistant calls the appropriate pipeline.
+4. The result is returned in a single conversational interface.
 
 ## Example Questions
 
@@ -111,17 +144,23 @@ The next step is to combine both systems through a routing layer:
 
 ### Product Search
 
-- "Avez-vous des sneakers black en 42 ?"
-- "Je cherche un hoodie white"
-- "Montre-moi des jeans black pour femme"
+- "Avez-vous des sneakers noires en 42 ?"
+- "Je cherche un hoodie blanc"
+- "Montre-moi des jeans noirs pour femme"
 - "Quels produits a moins de 60 euros ?"
+
+### Conversational Follow-up
+
+- "Avez-vous des sneakers noires en 42 ?"
+- "et en 43 ?"
 
 ## Current Limitations
 
-- the support assistant works from a single FAQ knowledge base
-- the product query parser is rule-based and still simple
-- the FAQ and product search are not fully unified yet
-- generation quality is limited by the local model
+- the support assistant still relies on a single FAQ document
+- the product query parser is rule-based and still limited
+- follow-up memory is short-term and heuristic-based
+- support answer generation quality depends on the local model and fallback logic
+- the visual storefront is a presentation layer, not a real e-commerce backend
 
 ## Project Structure
 
@@ -183,6 +222,8 @@ python -m tests.test_catalog_search
 python -m tests.test_catalog_parser
 python -m tests.test_catalog_pipeline
 python -m tests.test_catalog_query_pipeline
+python -m tests.test_query_router
+python -m tests.test_ecommerce_assistant_pipeline
 ```
 
 ## Why This Project Matters
@@ -193,20 +234,23 @@ This project demonstrates:
 - retrieval-augmented generation on unstructured business content
 - structured product search with pandas
 - query parsing and routing logic
+- conversational assistant design
 - business-oriented AI product thinking
 
 ## Roadmap
 
-### Done
+### Completed
 
 - [x] Build V1 FAQ-based support assistant
 - [x] Build V2 product catalog search pipeline
-- [ ] Build V3 hybrid assistant routing
+- [x] Build V3 hybrid assistant routing
+- [x] Add conversational follow-up handling
+- [x] Build a retail-inspired Streamlit interface
 
 ### Next
 
-- [ ] Combine FAQ and catalog handling in one assistant pipeline
-- [ ] Improve the Streamlit interface
-- [ ] Add conversation memory
-- [ ] Improve product query parsing
-- [ ] Prepare a polished demo version
+- [ ] Improve support answer quality further
+- [ ] Expand product query coverage
+- [ ] Add stronger conversation memory
+- [ ] Add more robust evaluation and testing
+- [ ] Prepare a polished final demo and deployment
