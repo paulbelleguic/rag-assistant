@@ -1,2 +1,0 @@
-Le Retrieval-Augmented Generation (RAG) est une architecture qui combine recherche d'information et génération de texte.
-Il permet à un modèle de langage de répondre à partir de documents externes.
