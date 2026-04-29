@@ -1,3 +1,6 @@
+import unicodedata
+
+
 class QueryRouter:
     """Route une question utilisateur vers la FAQ support ou le catalogue produits."""
 
@@ -41,6 +44,11 @@ class QueryRouter:
         "cherche",
         "montre-moi",
         "montre moi",
+        "moins de",
+        "taille 42",
+        "taille 38",
+        "taille m",
+        "taille l",
         "sneakers",
         "hoodie",
         "jeans",
@@ -64,7 +72,7 @@ class QueryRouter:
         if not query.strip():
             raise ValueError("La question utilisateur ne peut pas etre vide.")
 
-        normalized_query = query.lower()
+        normalized_query = self._normalize_text(query)
 
         support_score = self._count_matches(normalized_query, self.SUPPORT_KEYWORDS)
         product_score = self._count_matches(normalized_query, self.PRODUCT_KEYWORDS)
@@ -83,3 +91,9 @@ class QueryRouter:
     @staticmethod
     def _count_matches(query: str, keywords: set[str]) -> int:
         return sum(1 for keyword in keywords if keyword in query)
+
+    @staticmethod
+    def _normalize_text(text: str) -> str:
+        text = text.lower()
+        text = unicodedata.normalize("NFKD", text)
+        return "".join(char for char in text if not unicodedata.combining(char))

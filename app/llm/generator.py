@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
@@ -35,7 +36,7 @@ class AnswerGenerator:
         answer = self.tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
         if self._should_fallback(answer):
-            return self._build_fallback_answer(context)
+            return self._build_fallback_answer(question, context)
 
         return answer
 
@@ -68,7 +69,7 @@ class AnswerGenerator:
 
     @staticmethod
     def _should_fallback(answer: str) -> bool:
-        cleaned = answer.strip().lower()
+        cleaned = AnswerGenerator._normalize_text(answer.strip())
 
         if not cleaned:
             return True
@@ -107,20 +108,19 @@ class AnswerGenerator:
 
 
     @staticmethod
-    def _build_fallback_answer(context: str) -> str:
+    def _build_fallback_answer(question: str, context: str) -> str:
         sentences = AnswerGenerator._extract_meaningful_sentences(context)
 
         if not sentences:
             return "Je ne dispose pas de contexte suffisant pour repondre."
 
-        if len(sentences) == 1:
-             return f"Selon notre FAQ, {sentences[0]}"
+        ranked_sentences = AnswerGenerator._rank_sentences_for_question(question, sentences)
 
-        selected = sentences[:3]
+        if len(ranked_sentences) == 1:
+            return f"Selon notre FAQ, {ranked_sentences[0]}"
+
+        selected = ranked_sentences[:3]
         return "Selon notre FAQ, " + " ".join(selected)
-
-
-        return f"Selon notre FAQ, {sentences[0]} {sentences[1]}"
 
     @staticmethod
     def _build_fallback_summary(context: str) -> str:
@@ -150,3 +150,39 @@ class AnswerGenerator:
             cleaned_sentences.append(sentence)
 
         return cleaned_sentences
+
+    @staticmethod
+    def _rank_sentences_for_question(question: str, sentences: list[str]) -> list[str]:
+        question_keywords = AnswerGenerator._extract_keywords(question)
+
+        if not question_keywords:
+            return sentences
+
+        def sentence_score(sentence: str) -> tuple[int, int]:
+            normalized_sentence = AnswerGenerator._normalize_text(sentence)
+            keyword_hits = sum(1 for keyword in question_keywords if keyword in normalized_sentence)
+            informative_bonus = 1 if len(sentence.split()) >= 8 else 0
+            return (-keyword_hits, -informative_bonus)
+
+        ranked = sorted(sentences, key=sentence_score)
+        return ranked
+
+    @staticmethod
+    def _extract_keywords(text: str) -> list[str]:
+        normalized = AnswerGenerator._normalize_text(text)
+        tokens = re.findall(r"\b\w+\b", normalized)
+        stopwords = {
+            "qu", "que", "quoi", "qui", "de", "du", "des", "le", "la", "les",
+            "un", "une", "est", "et", "a", "au", "aux", "en", "dans", "sur",
+            "pour", "par", "comment", "pourquoi", "ce", "cette", "ces", "mon",
+            "ma", "mes", "vos", "votre", "je", "tu", "il", "elle", "nous",
+            "vous", "ils", "elles", "puis", "avoir", "avec"
+        }
+        return [token for token in tokens if token not in stopwords and len(token) > 2]
+
+    @staticmethod
+    def _normalize_text(text: str) -> str:
+        text = text.lower()
+        text = unicodedata.normalize("NFKD", text)
+        text = "".join(char for char in text if not unicodedata.combining(char))
+        return text

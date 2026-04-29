@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from app.llm.generator import AnswerGenerator
 from app.retrieval.retriever import Retriever
@@ -66,11 +67,16 @@ class RAGPipeline:
 
     @staticmethod
     def _extract_keywords(question: str) -> list[str]:
-        tokens = re.findall(r"\b\w+\b", question.lower())
+        normalized_question = unicodedata.normalize("NFKD", question.lower())
+        normalized_question = "".join(
+            char for char in normalized_question if not unicodedata.combining(char)
+        )
+        tokens = re.findall(r"\b\w+\b", normalized_question)
         stopwords = {
             "qu", "que", "quoi", "qui", "de", "du", "des", "le", "la", "les",
             "un", "une", "est", "et", "a", "au", "aux", "en", "dans", "sur",
-            "pour", "par", "comment", "pourquoi", "qu", "ce", "cette"
+            "pour", "par", "comment", "pourquoi", "qu", "ce", "cette", "mon",
+            "ma", "mes", "votre", "vos"
         }
         keywords = [token for token in tokens if token not in stopwords and len(token) > 2]
         return list(dict.fromkeys(keywords))
