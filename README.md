@@ -1,6 +1,6 @@
-# E-commerce Support Assistant
+# Olist AI Commerce Assistant
 
-E-commerce Support Assistant is a portfolio project focused on building a hybrid AI assistant for online retail. It combines:
+Olist AI Commerce Assistant is a portfolio project focused on building a hybrid AI assistant for an e-commerce ecosystem. It connects the chatbot experience to the same deployed AI backend used by the Olist sales dashboard. It combines:
 
 - a FAQ-based support assistant for delivery, returns, refunds, payment, and order tracking
 - a structured product search engine for catalog questions such as size, color, price, and stock
@@ -33,7 +33,7 @@ The current version already supports:
 - product and catalog questions from structured data
 - automatic routing between FAQ support and catalog search
 - simple conversational follow-ups such as product refinements
-- a retail-inspired chatbot interface in Streamlit
+- an Olist-branded chatbot interface in Streamlit
 - deployed API integration for the Streamlit interface
 
 This repository represents a complete portfolio version of the project: the core product is functional, testable, and demonstrable end-to-end.
@@ -89,8 +89,8 @@ Improved the interaction layer with:
 
 Added a stronger product-facing presentation layer with:
 
-- a modern retail-inspired layout
-- a storefront-style left panel
+- a modern Olist AI Commerce layout
+- an ecosystem-style left panel
 - a rounded floating assistant panel
 - scrollable in-panel chat history
 
@@ -104,7 +104,7 @@ Added a stronger product-facing presentation layer with:
 - catalog filtering with pandas
 - automatic routing between support and product search
 - simple conversational memory for follow-up requests
-- modern Streamlit chatbot interface
+- modern Streamlit chatbot interface branded around the Olist AI Commerce ecosystem
 - source display and optional technical details
 - API-based chat calls using `requests`
 
@@ -198,7 +198,7 @@ Added a stronger product-facing presentation layer with:
 - the product query parser is rule-based and still limited
 - follow-up memory is short-term and heuristic-based
 - the deployed version uses a lightweight FAQ answer path for stability on free hosting
-- the visual storefront is a presentation layer, not a real e-commerce backend
+- the visual left panel is a presentation layer, not a real e-commerce backend
 
 ## QA Status
 
@@ -310,7 +310,7 @@ This project demonstrates:
 - [x] Build V2 product catalog search pipeline
 - [x] Build V3 hybrid assistant routing
 - [x] Add conversational follow-up handling
-- [x] Build a retail-inspired Streamlit interface
+- [x] Build an Olist-branded Streamlit interface
 - [x] Run manual QA on core user scenarios
 - [x] Prepare documentation and presentation assets
 

@@ -4,14 +4,14 @@ import requests
 import streamlit as st
 
 
-APP_TITLE = "E-commerce Support Assistant"
+APP_TITLE = "Olist AI Commerce Assistant"
 API_URL = os.getenv("API_URL", "https://ai-backend-api-3jn5.onrender.com").rstrip("/")
-NAV_ITEMS = ["Long Sleeve", "Tees", "Beanies", "Polos", "Caps", "Shorts"]
+NAV_ITEMS = ["Sales", "Orders", "Delivery", "Returns", "Catalog", "Support"]
 FEATURED_PRODUCTS = [
-    {"name": "Shadow Tee", "tag": "NEW IN", "price": "34 EUR"},
-    {"name": "Core Hoodie", "tag": "NEW IN", "price": "79 EUR"},
-    {"name": "Utility Shorts", "tag": "NEW IN", "price": "49 EUR"},
-    {"name": "Steel Sneakers", "tag": "NEW IN", "price": "99 EUR"},
+    {"name": "Sales Dashboard", "tag": "ANALYTICS", "price": "KPIs"},
+    {"name": "Order Prediction", "tag": "ML API", "price": "/predict"},
+    {"name": "Support Assistant", "tag": "CHAT API", "price": "/chat"},
+    {"name": "Catalog Search", "tag": "PRODUCTS", "price": "Live"},
 ]
 
 
@@ -297,23 +297,23 @@ def render_storefront() -> None:
         f"""
         <div class="brand-shell">
             <div class="brand-topbar">
-                <div class="brand-name">COLDCULTURE</div>
+                <div class="brand-name">OLIST AI COMMERCE</div>
                 <div class="brand-nav">{nav_html}</div>
             </div>
         </div>
         <div class="hero-card">
             <div>
-                <div class="hero-kicker">Streetwear / Assistant Experience</div>
-                <div class="hero-title">A retail-inspired shell built to showcase the chatbot.</div>
+                <div class="hero-kicker">E-commerce / AI Assistant Experience</div>
+                <div class="hero-title">A customer-facing assistant connected to the Olist AI backend.</div>
                 <div class="hero-copy">
-                    The storefront gives context and atmosphere, but the core product remains the
-                    hybrid assistant on the right.
+                    This interface connects support answers, product search, and backend AI services
+                    into one production-style commerce experience.
                 </div>
-                <div class="hero-shop">SHOP</div>
+                <div class="hero-shop">ASK</div>
             </div>
             <div class="hero-model"></div>
         </div>
-        <div class="section-title">New In</div>
+        <div class="section-title">Connected AI Services</div>
         <div class="products-grid">{cards_html}</div>
         """,
         unsafe_allow_html=True,
