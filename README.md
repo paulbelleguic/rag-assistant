@@ -7,6 +7,14 @@ E-commerce Support Assistant is a portfolio project focused on building a hybrid
 
 The application routes each user question to the right source and exposes the result through a modern Streamlit interface.
 
+The deployed Streamlit interface is connected to a separate FastAPI backend:
+
+```text
+https://ai-backend-api-3jn5.onrender.com/chat/
+```
+
+This keeps the UI lightweight and demonstrates a frontend/backend AI architecture.
+
 ## Project Goal
 
 Build a practical e-commerce assistant able to answer questions like:
@@ -26,6 +34,7 @@ The current version already supports:
 - automatic routing between FAQ support and catalog search
 - simple conversational follow-ups such as product refinements
 - a retail-inspired chatbot interface in Streamlit
+- deployed API integration for the Streamlit interface
 
 This repository represents a complete portfolio version of the project: the core product is functional, testable, and demonstrable end-to-end.
 
@@ -87,7 +96,7 @@ Added a stronger product-facing presentation layer with:
 
 ## Current Features
 
-- FAQ knowledge base indexing from `data/raw/faq.txt`
+- FAQ support answers through the deployed API
 - chunking, embeddings, and FAISS retrieval
 - support answer generation with fallback logic
 - structured product catalog from `data/raw/products.csv`
@@ -97,6 +106,7 @@ Added a stronger product-facing presentation layer with:
 - simple conversational memory for follow-up requests
 - modern Streamlit chatbot interface
 - source display and optional technical details
+- API-based chat calls using `requests`
 
 ## Tech Stack
 
@@ -111,9 +121,17 @@ Added a stronger product-facing presentation layer with:
 
 ## How It Works
 
+### Deployed UI Flow
+
+1. The user asks a question in the Streamlit interface.
+2. Streamlit sends the message and conversation history to the deployed FastAPI API.
+3. The API routes the question to support or catalog logic.
+4. The API returns `answer`, `route`, and `sources`.
+5. Streamlit renders the response in the chat interface.
+
 ### FAQ Support Flow
 
-1. The FAQ knowledge base is loaded from `data/raw/faq.txt`.
+1. In the full local project, the FAQ knowledge base is loaded from `data/raw/faq.txt`.
 2. The text is split into chunks.
 3. Chunks are embedded locally.
 4. Embeddings are stored in a FAISS index.
@@ -130,8 +148,8 @@ Added a stronger product-facing presentation layer with:
 ### Hybrid Routing Flow
 
 1. The user asks a question in the chat interface.
-2. A router classifies the query as `support` or `catalog`.
-3. The assistant calls the appropriate pipeline.
+2. The deployed API classifies the query as `support` or `catalog`.
+3. The API calls the appropriate lightweight production path.
 4. The result is returned in a single conversational interface.
 
 ## Example Questions
@@ -179,7 +197,7 @@ Added a stronger product-facing presentation layer with:
 - the support assistant still relies on a single FAQ document
 - the product query parser is rule-based and still limited
 - follow-up memory is short-term and heuristic-based
-- support answer generation quality depends on the local model and fallback logic
+- the deployed version uses a lightweight FAQ answer path for stability on free hosting
 - the visual storefront is a presentation layer, not a real e-commerce backend
 
 ## QA Status
@@ -244,6 +262,13 @@ From the project root:
 python -m streamlit run streamlit_app.py
 ```
 
+The app calls the deployed API by default. To target another backend:
+
+```powershell
+$env:API_URL="http://127.0.0.1:8000"
+python -m streamlit run streamlit_app.py
+```
+
 ## Run Backend Tests
 
 ```powershell
@@ -274,6 +299,7 @@ This project demonstrates:
 - structured product search with pandas
 - query parsing and routing logic
 - conversational assistant design
+- integration with a deployed FastAPI AI backend
 - business-oriented AI product thinking
 
 ## Project Status
