@@ -1,11 +1,11 @@
-import streamlit as st
+import os
 
-from app.assistant.pipeline import EcommerceAssistantPipeline
-from app.ingestion.pipeline import IngestionPipeline
+import requests
+import streamlit as st
 
 
 APP_TITLE = "E-commerce Support Assistant"
-DEFAULT_FAQ_PATH = "data/raw/faq.txt"
+API_URL = os.getenv("API_URL", "https://ai-backend-api-3jn5.onrender.com").rstrip("/")
 NAV_ITEMS = ["Long Sleeve", "Tees", "Beanies", "Polos", "Caps", "Shorts"]
 FEATURED_PRODUCTS = [
     {"name": "Shadow Tee", "tag": "NEW IN", "price": "34 EUR"},
@@ -15,10 +15,14 @@ FEATURED_PRODUCTS = [
 ]
 
 
-@st.cache_resource
-def get_assistant_pipeline(index_version: int) -> EcommerceAssistantPipeline:
-    """Charge la pipeline hybride a partir de l'index courant."""
-    return EcommerceAssistantPipeline()
+def ask_backend(question: str, history: list[dict]) -> dict:
+    response = requests.post(
+        f"{API_URL}/chat/",
+        json={"question": question, "history": history},
+        timeout=120,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 def inject_styles() -> None:
@@ -320,18 +324,9 @@ def initialize_knowledge_base() -> None:
     if st.session_state.get("document_ready", False):
         return
 
-    try:
-        ingestion_pipeline = IngestionPipeline()
-        chunk_count = ingestion_pipeline.ingest_file(DEFAULT_FAQ_PATH)
-
-        st.session_state["document_ready"] = True
-        st.session_state["indexed_file"] = "faq.txt"
-        st.session_state["index_version"] = st.session_state.get("index_version", 0) + 1
-        st.session_state["knowledge_status"] = (
-            f"FAQ knowledge base ready ({chunk_count} chunks indexed)."
-        )
-    except Exception as exc:
-        st.session_state["knowledge_status"] = f"Knowledge base error: {exc}"
+    st.session_state["document_ready"] = True
+    st.session_state["indexed_file"] = "remote-api"
+    st.session_state["knowledge_status"] = f"Connected to API backend: {API_URL}"
 
 
 def render_chat_history(show_passages: bool) -> None:
@@ -380,11 +375,13 @@ def render_chat_history(show_passages: bool) -> None:
                     )
                     continue
 
-                meta = (
-                    f"Routing: {message['route']} | "
-                    f"support={message['routing']['support_score']} | "
-                    f"catalog={message['routing']['product_score']}"
-                )
+                routing = message.get("routing", {})
+                support_score = routing.get("support_score")
+                product_score = routing.get("product_score")
+                meta = f"Routing: {message.get('route', 'unknown')}"
+
+                if support_score is not None and product_score is not None:
+                    meta += f" | support={support_score} | catalog={product_score}"
                 assistant_content = message["content"].replace("\n", "<br>")
                 st.markdown(
                     f"""
@@ -412,17 +409,26 @@ def render_chat_history(show_passages: bool) -> None:
 
     if last_assistant_message["route"] == "support":
         with st.expander("Retrieved support passages"):
-            for index, passage in enumerate(last_assistant_message["details"]["passages"], start=1):
+            passages = last_assistant_message.get("details", {}).get("passages", [])
+            if not passages:
+                st.write("Technical passages are handled by the remote API.")
+                return
+
+            for index, passage in enumerate(passages, start=1):
                 st.markdown(
                     f"**Passage {index}**  \n"
-                    f"Source : `{passage['source']}`  \n"
-                    f"Score : `{passage['score']:.4f}`"
+                    f"Source : `{passage.get('source', 'remote-api')}`  \n"
+                    f"Score : `{passage.get('score', 0):.4f}`"
                 )
-                st.write(passage["content"])
+                st.write(passage.get("content", ""))
     else:
         with st.expander("Catalog details"):
-            st.write("Filtres extraits :", last_assistant_message["details"]["filters"])
-            st.write(last_assistant_message["details"]["formatted_results"])
+            details = last_assistant_message.get("details", {})
+            if details:
+                st.write("Filtres extraits :", details.get("filters"))
+                st.write(details.get("formatted_results"))
+            else:
+                st.write("Catalog details are handled by the remote API.")
 
     st.caption("Sources")
     for source in last_assistant_message["sources"]:
@@ -458,9 +464,8 @@ def handle_question() -> None:
     st.session_state["chat_history"].append({"role": "user", "content": question})
 
     try:
-        assistant_pipeline = get_assistant_pipeline(st.session_state.get("index_version", 0))
-        result = assistant_pipeline.ask(
-            query=question,
+        result = ask_backend(
+            question=question,
             history=st.session_state["chat_history"][:-1],
         )
 
@@ -469,12 +474,14 @@ def handle_question() -> None:
                 "role": "assistant",
                 "content": result["answer"],
                 "route": result["route"],
-                "routing": result["routing"],
-                "details": result["details"],
+                "routing": result.get("routing", {}),
+                "details": result.get("details", {}),
                 "sources": result["sources"],
             }
         )
         st.rerun()
+    except requests.RequestException as exc:
+        st.error(f"Erreur pendant l'appel API : {exc}")
     except Exception as exc:
         st.error(f"Erreur pendant la generation de la reponse : {exc}")
 
